@@ -1,7 +1,0 @@
-{
-  "tool_name": "PowerShell",
-  "tool_input_preview": "{\"command\":\"Set-Location C:\\\\claude\\\\repo\\\\magic-story-image; git init; git add .; git commit -m \\\"Initial commit: Magic Story Image — kid-friendly AI illustration generator\\\"\",\"description\":\"Initiali...",
-  "error": "Exit code 128\nInitialized empty Git repository in C:/Claude/repo/magic-story-image/.git/\nwarning: in the working copy of 'css/style.css', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'index.html', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'js/app.js', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'js/canvas.js', LF will be replaced by CRLF the next time Git touche...",
-  "timestamp": "2026-05-04T20:08:00.771Z",
-  "retry_count": 1
-}
