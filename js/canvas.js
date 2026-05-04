@@ -7,6 +7,11 @@ const DrawCanvas = (() => {
   let lastX = 0,
     lastY = 0;
   let brushCursor;
+  let undoStack = [];
+  let redoStack = [];
+  let hasDrawing = false;
+  const MAX_HISTORY = 30;
+  let onChangeCallback = null;
 
   function init() {
     canvas = document.getElementById("draw-canvas");
@@ -16,14 +21,17 @@ const DrawCanvas = (() => {
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
 
+    // Save blank state
+    saveState(true);
+
     canvas.addEventListener("mousedown", startDraw);
     canvas.addEventListener("mousemove", draw);
-    canvas.addEventListener("mouseup", stopDraw);
+    canvas.addEventListener("mouseup", stopDrawAndSave);
     canvas.addEventListener("mouseleave", stopDraw);
 
     canvas.addEventListener("touchstart", handleTouch, { passive: false });
     canvas.addEventListener("touchmove", handleTouch, { passive: false });
-    canvas.addEventListener("touchend", stopDraw);
+    canvas.addEventListener("touchend", stopDrawAndSave);
 
     brushCursor = document.createElement("div");
     brushCursor.className = "brush-cursor";
@@ -72,7 +80,31 @@ const DrawCanvas = (() => {
       updateBrushCursorStyle();
     });
 
-    document.getElementById("btn-clear").addEventListener("click", clear);
+    document.getElementById("btn-clear").addEventListener("click", () => {
+      saveState();
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    });
+
+    document.getElementById("btn-undo").addEventListener("click", undo);
+    document.getElementById("btn-redo").addEventListener("click", redo);
+
+    // Keyboard shortcuts
+    document.addEventListener("keydown", (e) => {
+      const isTextInput =
+        e.target.tagName === "TEXTAREA" ||
+        e.target.tagName === "INPUT" ||
+        e.target.isContentEditable;
+      if (isTextInput) return;
+
+      if ((e.ctrlKey || e.metaKey) && e.key === "z") {
+        e.preventDefault();
+        undo();
+      } else if ((e.ctrlKey || e.metaKey) && e.key === "y") {
+        e.preventDefault();
+        redo();
+      }
+    });
 
     // Upload
     const fileInput = document.getElementById("file-upload");
@@ -87,6 +119,48 @@ const DrawCanvas = (() => {
 
     updateBrushCursorStyle();
     updateColorDots();
+    updateUndoRedoButtons();
+  }
+
+  function saveState(skipRedoClear) {
+    undoStack.push(canvas.toDataURL("image/png"));
+    if (undoStack.length > MAX_HISTORY) undoStack.shift();
+    if (!skipRedoClear) redoStack = [];
+    updateUndoRedoButtons();
+  }
+
+  function undo() {
+    if (undoStack.length <= 1) return;
+    const current = undoStack.pop();
+    redoStack.push(current);
+    restoreState(undoStack[undoStack.length - 1]);
+    updateUndoRedoButtons();
+  }
+
+  function redo() {
+    if (redoStack.length === 0) return;
+    const next = redoStack.pop();
+    undoStack.push(next);
+    restoreState(next);
+    updateUndoRedoButtons();
+  }
+
+  function restoreState(dataUrl) {
+    const img = new Image();
+    img.onload = () => {
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+      notifyChange();
+    };
+    img.src = dataUrl;
+  }
+
+  function updateUndoRedoButtons() {
+    const undoBtn = document.getElementById("btn-undo");
+    const redoBtn = document.getElementById("btn-redo");
+    if (undoBtn) undoBtn.disabled = undoStack.length <= 1;
+    if (redoBtn) redoBtn.disabled = redoStack.length === 0;
   }
 
   function getPos(e) {
@@ -119,10 +193,20 @@ const DrawCanvas = (() => {
     ctx.stroke();
     lastX = pos.x;
     lastY = pos.y;
+    if (!hasDrawing) {
+      hasDrawing = true;
+      notifyChange();
+    }
   }
 
   function stopDraw() {
     drawing = false;
+  }
+
+  function stopDrawAndSave() {
+    if (!drawing) return;
+    drawing = false;
+    saveState();
   }
 
   function handleTouch(e) {
@@ -158,11 +242,15 @@ const DrawCanvas = (() => {
   }
 
   function clear() {
+    saveState();
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    hasDrawing = false;
+    notifyChange();
   }
 
   function loadImage(file) {
+    saveState();
     const reader = new FileReader();
     reader.onload = (e) => {
       const img = new Image();
@@ -176,6 +264,8 @@ const DrawCanvas = (() => {
         const x = (canvas.width - img.width * scale) / 2;
         const y = (canvas.height - img.height * scale) / 2;
         ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+        hasDrawing = true;
+        notifyChange();
       };
       img.src = e.target.result;
     };
@@ -190,5 +280,17 @@ const DrawCanvas = (() => {
     return canvas.toDataURL("image/png");
   }
 
-  return { init, clear, loadImage, toBase64, toDataURL };
+  function hasContent() {
+    return hasDrawing;
+  }
+
+  function onChange(cb) {
+    onChangeCallback = cb;
+  }
+
+  function notifyChange() {
+    if (onChangeCallback) onChangeCallback();
+  }
+
+  return { init, clear, loadImage, toBase64, toDataURL, hasContent, onChange };
 })();

@@ -1,0 +1,7 @@
+{
+  "tool_name": "PowerShell",
+  "tool_input_preview": "{\"command\":\"Set-Location C:\\\\claude\\\\repo\\\\magic-story-image; git push -u origin master:main\",\"description\":\"Push master branch to origin main\"}",
+  "error": "Exit code 1\nremote: error: GH013: Repository rule violations found for refs/heads/main.        \nremote: \nremote: - GITHUB PUSH PROTECTION        \nremote:   —————————————————————————————————————————        \nremote:     Resolve the following violations before pushing again        \nremote: \nremote:     - Push cannot contain secrets        \nremote: \nremote:             \nremote:      (?) Learn how to resolve a blocked push        \nremote:      https://docs.github.com/code-security/secret-scanning/wor...",
+  "timestamp": "2026-05-04T20:27:18.767Z",
+  "retry_count": 2
+}

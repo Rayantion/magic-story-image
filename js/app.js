@@ -23,9 +23,19 @@ const App = (() => {
     });
 
     $("btn-generate").addEventListener("click", startGeneration);
+    $("btn-generate").disabled = true;
     $("btn-dismiss-error").addEventListener("click", () =>
       $("error-banner").classList.add("hidden"),
     );
+
+    $("description-input").addEventListener("input", updateGenerateButton);
+    DrawCanvas.onChange(updateGenerateButton);
+  }
+
+  function updateGenerateButton() {
+    const hasDesc = $("description-input").value.trim().length > 0;
+    const hasDrawing = DrawCanvas.hasContent();
+    $("btn-generate").disabled = !(hasDesc && hasDrawing);
   }
 
   function showError(msg) {
@@ -100,7 +110,11 @@ const App = (() => {
           Array.isArray(data) && data.length > 0 && data[0].json
             ? data[0].json
             : data;
-        imageUrl = payload.imageUrl || payload.url || "";
+        imageUrl =
+          payload.imageUrl ||
+          payload.myField ||
+          payload.url ||
+          "";
       } else if (
         contentType.includes("image/") ||
         contentType.includes("octet-stream")

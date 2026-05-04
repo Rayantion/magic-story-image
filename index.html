@@ -102,6 +102,12 @@
           />
         </div>
         <div class="tool-group">
+          <button id="btn-undo" class="tool-btn" data-i18n="draw.undo" disabled>
+            Undo
+          </button>
+          <button id="btn-redo" class="tool-btn" data-i18n="draw.redo" disabled>
+            Redo
+          </button>
           <button
             id="btn-eraser"
             class="tool-btn"
@@ -117,21 +123,12 @@
             Clear
           </button>
         </div>
-        <div class="tool-group">
-          <button
-            id="btn-upload"
-            class="tool-btn"
-            data-i18n="draw.upload"
-          >
-            Upload
-          </button>
-          <input
-            type="file"
-            id="file-upload"
-            accept="image/*"
-            class="hidden"
-          />
-        </div>
+      </div>
+
+      <div class="upload-wrap">
+        <label class="upload-label" data-i18n="draw.upload_label">Upload Image</label>
+        <button id="btn-upload" class="tool-btn" data-i18n="draw.upload">Upload</button>
+        <input type="file" id="file-upload" accept="image/*" class="hidden" />
       </div>
 
       <div class="description-wrap">
