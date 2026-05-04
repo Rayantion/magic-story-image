@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Magic Story Image</title>
+    <meta
+      name="description"
+      content="Draw a picture, AI creates a beautiful illustration!"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <!-- Language Switcher -->
+    <div class="lang-bar">
+      <button class="lang-btn" data-lang="en">EN</button>
+      <button class="lang-btn active" data-lang="zh-TW">中文</button>
+    </div>
+
+    <!-- Header -->
+    <header class="app-header">
+      <h1 class="app-title" data-i18n="app.title">Magic Story Image</h1>
+      <p class="app-subtitle" data-i18n="app.subtitle">
+        Draw a picture, get an AI illustration!
+      </p>
+    </header>
+
+    <!-- Canvas Section -->
+    <section class="canvas-section">
+      <div class="canvas-area">
+        <canvas id="draw-canvas" width="800" height="600"></canvas>
+      </div>
+
+      <div class="toolbar">
+        <div class="tool-group">
+          <input
+            type="color"
+            id="color-picker"
+            value="#2d2dff"
+            class="color-picker"
+          />
+          <div class="preset-colors">
+            <button
+              class="color-dot"
+              data-color="#ff4444"
+              style="background: #ff4444"
+            ></button>
+            <button
+              class="color-dot"
+              data-color="#ff8c00"
+              style="background: #ff8c00"
+            ></button>
+            <button
+              class="color-dot"
+              data-color="#ffd700"
+              style="background: #ffd700"
+            ></button>
+            <button
+              class="color-dot"
+              data-color="#44cc44"
+              style="background: #44cc44"
+            ></button>
+            <button
+              class="color-dot"
+              data-color="#2d2dff"
+              style="background: #2d2dff"
+            ></button>
+            <button
+              class="color-dot"
+              data-color="#aa44ff"
+              style="background: #aa44ff"
+            ></button>
+            <button
+              class="color-dot"
+              data-color="#ff44aa"
+              style="background: #ff44aa"
+            ></button>
+            <button
+              class="color-dot"
+              data-color="#000000"
+              style="background: #000000"
+            ></button>
+          </div>
+        </div>
+        <div class="tool-group">
+          <label class="size-label" data-i18n="draw.size">Size</label>
+          <input
+            type="range"
+            id="brush-size"
+            min="2"
+            max="40"
+            value="8"
+            class="size-slider"
+          />
+        </div>
+        <div class="tool-group">
+          <button
+            id="btn-eraser"
+            class="tool-btn"
+            data-i18n="draw.eraser"
+          >
+            Eraser
+          </button>
+          <button
+            id="btn-clear"
+            class="tool-btn tool-btn-danger"
+            data-i18n="draw.clear"
+          >
+            Clear
+          </button>
+        </div>
+        <div class="tool-group">
+          <button
+            id="btn-upload"
+            class="tool-btn"
+            data-i18n="draw.upload"
+          >
+            Upload
+          </button>
+          <input
+            type="file"
+            id="file-upload"
+            accept="image/*"
+            class="hidden"
+          />
+        </div>
+      </div>
+
+      <div class="description-wrap">
+        <label
+          class="description-label"
+          for="description-input"
+          data-i18n="draw.description_label"
+          >Describe your drawing</label
+        >
+        <textarea
+          id="description-input"
+          rows="3"
+          maxlength="300"
+          data-i18n-placeholder="draw.description"
+          placeholder="e.g. A dragon flying over a rainbow castle"
+        ></textarea>
+      </div>
+
+      <button
+        id="btn-generate"
+        class="btn-primary btn-big"
+        data-i18n="draw.generate"
+      >
+        Generate My Image
+      </button>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="gallery-section">
+      <h2 class="gallery-title" data-i18n="gallery.title">
+        Your Generated Images
+      </h2>
+      <div id="gallery-grid" class="gallery-grid"></div>
+      <div
+        id="gallery-empty"
+        class="gallery-empty"
+        data-i18n="gallery.empty"
+      >
+        No images yet — draw something and click Generate!
+      </div>
+    </section>
+
+    <!-- Error Display -->
+    <div id="error-banner" class="error-banner hidden">
+      <span id="error-text"></span>
+      <button id="btn-dismiss-error" class="error-dismiss">&times;</button>
+    </div>
+
+    <script src="js/i18n.js"></script>
+    <script src="js/canvas.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
