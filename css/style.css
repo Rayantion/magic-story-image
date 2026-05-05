@@ -106,6 +106,28 @@ body {
   color: var(--primary);
 }
 
+.header-btn-emerald {
+  border-color: #10b981;
+  color: #059669;
+  background: #ecfdf5;
+}
+
+.header-btn-emerald:hover {
+  border-color: #059669;
+  color: #047857;
+  background: #d1fae5;
+}
+
+.dark .header-btn-emerald {
+  border-color: #34d399;
+  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.15);
+}
+
+.dark .header-btn-emerald:hover {
+  background: rgba(16, 185, 129, 0.25);
+}
+
 .contact-btn.copied {
   border-color: var(--accent-green);
   color: var(--accent-green);
