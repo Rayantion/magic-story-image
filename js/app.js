@@ -132,6 +132,8 @@ const App = (() => {
 
   async function callWebhook(id, base64, description, language) {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 300000);
       const response = await fetch(WEBHOOK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -140,7 +142,9 @@ const App = (() => {
           description: description,
           language: language,
         }),
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         throw new Error(
@@ -182,7 +186,11 @@ const App = (() => {
       const gen = generations.find((g) => g.id === id);
       if (gen) {
         gen.status = "error";
-        gen.error = err.message || I18N.t("error.generic");
+        if (err.name === "AbortError") {
+          gen.error = I18N.t("error.timeout");
+        } else {
+          gen.error = err.message || I18N.t("error.generic");
+        }
         renderGallery();
       }
     }
@@ -287,7 +295,7 @@ const App = (() => {
       drawingWrap.style.cursor = "pointer";
       const drawingImg = document.createElement("img");
       drawingImg.src = g.drawingDataUrl;
-      drawingImg.alt = "Drawing";
+      drawingImg.alt = I18N.t("gallery.alt_drawing");
       const drawingLabel = document.createElement("span");
       drawingLabel.className = "img-label";
       drawingLabel.textContent = I18N.t("gallery.drawn");
@@ -319,7 +327,7 @@ const App = (() => {
       } else if (g.generatedImageUrl && isSafeUrl(g.generatedImageUrl)) {
         const aiImg = document.createElement("img");
         aiImg.src = g.generatedImageUrl;
-        aiImg.alt = "AI Image";
+        aiImg.alt = I18N.t("gallery.alt_ai");
         aiWrap.appendChild(aiImg);
       }
 

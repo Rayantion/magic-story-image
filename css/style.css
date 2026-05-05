@@ -636,7 +636,7 @@ body {
   padding: 0 0.75rem 0.75rem;
 }
 
-.gallery-card .btn-small {
+.btn-small {
   padding: 0.4rem 0.75rem;
   border: 2px solid var(--text-3);
   border-radius: 10px;
@@ -649,10 +649,11 @@ body {
   transition: all 0.2s;
 }
 
-.gallery-card .btn-small:hover {
+.btn-small:hover {
   border-color: var(--primary);
   color: var(--primary);
 }
+
 
 /* === Loading Animation === */
 .loading-animation {
