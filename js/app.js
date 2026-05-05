@@ -1,14 +1,24 @@
 const App = (() => {
   const WEBHOOK_URL =
     "https://n8n.rayantion.me/webhook/e98c0572-0b47-40c9-b830-db97d4676521/";
+  const DB_NAME = "magic-story-image";
+  const DB_STORE = "generations";
+  const DB_VERSION = 1;
+  const CACHE_LIMIT = 20;
 
   let generations = [];
+  let db = null;
+  let compareIndex = 0;
 
   const $ = (id) => document.getElementById(id);
 
-  function init() {
+  async function init() {
     DrawCanvas.init();
     I18N.apply();
+
+    db = await openDB();
+    generations = await loadGenerations();
+    renderGallery();
 
     const savedLang = localStorage.getItem("msi_lang") || "zh-TW";
     I18N.setLang(savedLang);
@@ -28,8 +38,45 @@ const App = (() => {
       $("error-banner").classList.add("hidden"),
     );
 
+    // Contact
+    $("btn-contact").addEventListener("click", () => {
+      $("contact-info").classList.toggle("hidden");
+    });
+    $("btn-copy-email").addEventListener("click", copyEmail);
+
     $("description-input").addEventListener("input", updateGenerateButton);
     DrawCanvas.onChange(updateGenerateButton);
+
+    // Clear history
+    $("btn-clear-history").addEventListener("click", clearHistory);
+
+    // Comparison viewer
+    $("btn-compare-close").addEventListener("click", closeCompare);
+    $("btn-show-drawing").addEventListener("click", () => showCompareSide(0));
+    $("btn-show-ai").addEventListener("click", () => showCompareSide(1));
+    $("compare-overlay").addEventListener("click", (e) => {
+      if (e.target.id === "compare-overlay") closeCompare();
+    });
+
+    // Swipe support for comparison
+    let touchStartX = 0;
+    $("compare-overlay").addEventListener("touchstart", (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+    $("compare-overlay").addEventListener("touchend", (e) => {
+      const diff = e.changedTouches[0].screenX - touchStartX;
+      if (Math.abs(diff) > 50) {
+        showCompareSide(diff > 0 ? 0 : 1);
+      }
+    });
+
+    // Keyboard arrows for comparison
+    document.addEventListener("keydown", (e) => {
+      if ($("compare-overlay").classList.contains("hidden")) return;
+      if (e.key === "ArrowLeft") showCompareSide(0);
+      if (e.key === "ArrowRight") showCompareSide(1);
+      if (e.key === "Escape") closeCompare();
+    });
   }
 
   function updateGenerateButton() {
@@ -65,7 +112,7 @@ const App = (() => {
 
     const drawingDataUrl = DrawCanvas.toDataURL();
     const base64 = DrawCanvas.toBase64();
-    const id = Date.now() + Math.random().toString(36).slice(2, 8);
+    const id = Date.now().toString();
 
     generations.unshift({
       id,
@@ -74,10 +121,12 @@ const App = (() => {
       status: "generating",
       generatedImageUrl: null,
       error: null,
+      createdAt: Date.now(),
     });
 
     DrawCanvas.clear();
     $("description-input").value = "";
+    updateGenerateButton();
 
     renderGallery();
     callWebhook(id, base64, description, I18N.getLang());
@@ -111,10 +160,7 @@ const App = (() => {
             ? data[0].json
             : data;
         imageUrl =
-          payload.imageUrl ||
-          payload.myField ||
-          payload.url ||
-          "";
+          payload.imageUrl || payload.myField || payload.url || "";
       } else if (
         contentType.includes("image/") ||
         contentType.includes("octet-stream")
@@ -131,6 +177,7 @@ const App = (() => {
       if (gen) {
         gen.status = "done";
         gen.generatedImageUrl = imageUrl;
+        await saveGeneration(gen);
         renderGallery();
       }
     } catch (err) {
@@ -143,17 +190,88 @@ const App = (() => {
     }
   }
 
+  // === IndexedDB ===
+
+  function openDB() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onerror = () => reject(req.error);
+      req.onsuccess = () => resolve(req.result);
+      req.onupgradeneeded = () => {
+        const d = req.result;
+        if (!d.objectStoreNames.contains(DB_STORE)) {
+          d.createObjectStore(DB_STORE, { keyPath: "id" });
+        }
+      };
+    });
+  }
+
+  function saveGeneration(gen) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(DB_STORE, "readwrite");
+      const store = tx.objectStore(DB_STORE);
+      store.put(gen);
+      tx.oncomplete = resolve;
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+
+  function loadGenerations() {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(DB_STORE, "readonly");
+      const store = tx.objectStore(DB_STORE);
+      const req = store.getAll();
+      req.onsuccess = () => {
+        const all = req.result;
+        all.sort((a, b) => b.createdAt - a.createdAt);
+        // Only keep completed ones in cache, limit to 20
+        const completed = all
+          .filter((g) => g.status === "done")
+          .slice(0, CACHE_LIMIT);
+        resolve(completed);
+      };
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  async function clearHistory() {
+    const tx = db.transaction(DB_STORE, "readwrite");
+    const store = tx.objectStore(DB_STORE);
+    await new Promise((resolve, reject) => {
+      const req = store.clear();
+      req.onsuccess = resolve;
+      req.onerror = () => reject(req.error);
+    });
+    generations = [];
+    renderGallery();
+  }
+
+  function deleteGeneration(id) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(DB_STORE, "readwrite");
+      const store = tx.objectStore(DB_STORE);
+      const req = store.delete(id);
+      req.onsuccess = resolve;
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  // === Gallery Rendering ===
+
   function renderGallery() {
     const grid = $("gallery-grid");
     const empty = $("gallery-empty");
+    const clearBtn = $("btn-clear-history");
 
     if (generations.length === 0) {
       grid.textContent = "";
       empty.classList.remove("hidden");
+      clearBtn.classList.add("hidden");
       return;
     }
 
     empty.classList.add("hidden");
+    clearBtn.classList.remove("hidden");
     grid.textContent = "";
 
     generations.forEach((g) => {
@@ -168,6 +286,7 @@ const App = (() => {
       // Original drawing
       const drawingWrap = document.createElement("div");
       drawingWrap.className = "img-wrap";
+      drawingWrap.style.cursor = "pointer";
       const drawingImg = document.createElement("img");
       drawingImg.src = g.drawingDataUrl;
       drawingImg.alt = "Drawing";
@@ -176,11 +295,13 @@ const App = (() => {
       drawingLabel.textContent = I18N.t("gallery.drawn");
       drawingWrap.appendChild(drawingImg);
       drawingWrap.appendChild(drawingLabel);
+      drawingWrap.addEventListener("click", () => openCompare(g.id));
       imagesDiv.appendChild(drawingWrap);
 
       // AI image / loading / error
       const aiWrap = document.createElement("div");
       aiWrap.className = "img-wrap";
+      aiWrap.style.cursor = g.status === "done" ? "pointer" : "default";
 
       if (g.status === "generating") {
         const loadingDiv = document.createElement("div");
@@ -202,6 +323,10 @@ const App = (() => {
         aiImg.src = g.generatedImageUrl;
         aiImg.alt = "AI Image";
         aiWrap.appendChild(aiImg);
+      }
+
+      if (g.status === "done") {
+        aiWrap.addEventListener("click", () => openCompare(g.id));
       }
 
       const aiLabel = document.createElement("span");
@@ -250,7 +375,6 @@ const App = (() => {
         retryBtn.addEventListener("click", () => {
           const gen = generations.find((item) => item.id === g.id);
           if (!gen || !gen.drawingDataUrl) return;
-          // Re-encode the stored drawing for retry
           const base64 = gen.drawingDataUrl.split(",")[1];
           gen.status = "generating";
           gen.error = null;
@@ -261,12 +385,13 @@ const App = (() => {
       }
 
       if (g.generatedImageUrl && isSafeUrl(g.generatedImageUrl)) {
-        const downloadLink = document.createElement("a");
-        downloadLink.className = "btn-small";
-        downloadLink.href = g.generatedImageUrl;
-        downloadLink.download = "magic-story-image.png";
-        downloadLink.textContent = "Download";
-        actionsDiv.appendChild(downloadLink);
+        const downloadBtn = document.createElement("button");
+        downloadBtn.className = "btn-small";
+        downloadBtn.textContent = I18N.t("gallery.download");
+        downloadBtn.addEventListener("click", () =>
+          downloadImage(g.generatedImageUrl, "magic-story-image.png"),
+        );
+        actionsDiv.appendChild(downloadBtn);
       }
 
       if (actionsDiv.children.length > 0) {
@@ -275,6 +400,69 @@ const App = (() => {
 
       grid.appendChild(card);
     });
+  }
+
+  // === Contact ===
+
+  async function copyEmail() {
+    const email = "aaron@jieren.my.id";
+    try {
+      await navigator.clipboard.writeText(email);
+    } catch {
+      // Fallback for older browsers
+      const ta = document.createElement("textarea");
+      ta.value = email;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }
+    const toast = $("copy-toast");
+    toast.classList.remove("hidden");
+    setTimeout(() => toast.classList.add("hidden"), 2000);
+  }
+
+  // === Direct Download ===
+
+  async function downloadImage(url, filename) {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    } catch (err) {
+      showError(I18N.t("error.generic"));
+    }
+  }
+
+  // === Comparison Viewer ===
+
+  function openCompare(id) {
+    const gen = generations.find((g) => g.id === id);
+    if (!gen) return;
+    compareIndex = 0;
+    $("compare-drawing").src = gen.drawingDataUrl;
+    $("compare-ai").src = gen.generatedImageUrl || "";
+    $("compare-overlay").classList.remove("hidden");
+    showCompareSide(0);
+  }
+
+  function closeCompare() {
+    $("compare-overlay").classList.add("hidden");
+  }
+
+  function showCompareSide(index) {
+    compareIndex = index;
+    $("compare-drawing-wrap").classList.toggle("active", index === 0);
+    $("compare-ai-wrap").classList.toggle("active", index === 1);
+    $("btn-show-drawing").classList.toggle("active", index === 0);
+    $("btn-show-ai").classList.toggle("active", index === 1);
   }
 
   document.addEventListener("DOMContentLoaded", init);

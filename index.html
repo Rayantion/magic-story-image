@@ -158,9 +158,14 @@
 
     <!-- Gallery Section -->
     <section class="gallery-section">
-      <h2 class="gallery-title" data-i18n="gallery.title">
-        Your Generated Images
-      </h2>
+      <div class="gallery-header">
+        <h2 class="gallery-title" data-i18n="gallery.title">
+          Your Generated Images
+        </h2>
+        <button id="btn-clear-history" class="btn-small hidden" data-i18n="gallery.clear_history">
+          Clear History
+        </button>
+      </div>
       <div id="gallery-grid" class="gallery-grid"></div>
       <div
         id="gallery-empty"
@@ -169,6 +174,46 @@
       >
         No images yet — draw something and click Generate!
       </div>
+    </section>
+
+    <!-- Comparison Viewer Modal -->
+    <div id="compare-overlay" class="compare-overlay hidden">
+      <div class="compare-card">
+        <button id="btn-compare-close" class="compare-close">&times;</button>
+        <div class="compare-images">
+          <div id="compare-drawing-wrap" class="compare-img-wrap active">
+            <img id="compare-drawing" src="" alt="Drawing" />
+            <span class="compare-label" data-i18n="gallery.drawn">Your Drawing</span>
+          </div>
+          <div id="compare-ai-wrap" class="compare-img-wrap">
+            <img id="compare-ai" src="" alt="AI Image" />
+            <span class="compare-label" data-i18n="gallery.ai_image">AI Magic</span>
+          </div>
+        </div>
+        <div class="compare-controls">
+          <button id="btn-show-drawing" class="compare-btn active" data-i18n="gallery.drawn">Your Drawing</button>
+          <button id="btn-show-ai" class="compare-btn" data-i18n="gallery.ai_image">AI Magic</button>
+        </div>
+        <p class="compare-hint" data-i18n="gallery.compare_hint">Swipe or use arrow keys to compare</p>
+      </div>
+    </div>
+
+    <!-- Contact Section -->
+    <section class="contact-section">
+      <button id="btn-contact" class="btn-secondary" data-i18n="contact.button">Contact</button>
+      <div id="contact-info" class="contact-info hidden">
+        <p data-i18n="contact.email_label">Email:</p>
+        <button id="btn-copy-email" class="email-btn">aaron@jieren.my.id</button>
+        <span id="copy-toast" class="copy-toast hidden" data-i18n="contact.copied">Copied!</span>
+      </div>
+      <a
+        href="https://github.com/Rayantion/magic-story-image"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="github-star"
+        >
+        ⭐ Star on GitHub
+      </a>
     </section>
 
     <!-- Error Display -->

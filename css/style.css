@@ -335,10 +335,16 @@ body {
   padding: 0 1.5rem 3rem;
 }
 
+.gallery-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
 .gallery-title {
   font-family: var(--font-display);
   font-size: 1.6rem;
-  margin-bottom: 1.25rem;
   color: var(--text);
 }
 
@@ -356,6 +362,124 @@ body {
   background: var(--surface);
   border-radius: var(--radius-sm);
   border: 2px dashed var(--text-3);
+}
+
+/* === Comparison Viewer === */
+.compare-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(45, 36, 36, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1rem;
+  touch-action: pan-y;
+}
+
+.compare-card {
+  width: 100%;
+  max-width: 900px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  position: relative;
+}
+
+.compare-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: var(--surface-alt);
+  border: none;
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 1.4rem;
+  color: var(--text-2);
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.compare-images {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: var(--surface-alt);
+}
+
+.compare-img-wrap {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.compare-img-wrap.active {
+  opacity: 1;
+}
+
+.compare-img-wrap img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.compare-label {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(45, 36, 36, 0.7);
+  color: #fff;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.compare-controls {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--surface);
+  border-top: 1px solid var(--surface-alt);
+}
+
+.compare-btn {
+  padding: 0.5rem 1.25rem;
+  border: 2px solid var(--text-3);
+  border-radius: 20px;
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: all 0.2s;
+}
+
+.compare-btn.active {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-dim);
+}
+
+.compare-hint {
+  text-align: center;
+  color: var(--text-3);
+  font-size: 0.8rem;
+  padding-bottom: 1rem;
+  margin: 0;
 }
 
 /* === Gallery Card === */
@@ -552,6 +676,90 @@ body {
   cursor: pointer;
   padding: 0;
   line-height: 1;
+}
+
+/* === Contact Section === */
+.contact-section {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 1.5rem 2rem;
+  text-align: center;
+}
+
+.contact-info {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.contact-info p {
+  color: var(--text-2);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.email-btn {
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-sm);
+  background: var(--primary-dim);
+  color: var(--primary);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: all 0.2s;
+}
+
+.email-btn:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.copy-toast {
+  display: inline-block;
+  margin-left: 0.75rem;
+  padding: 0.3rem 0.75rem;
+  background: var(--accent-green);
+  color: #fff;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  animation: fade-in 0.3s ease;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.github-star {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--text-3);
+  border-radius: 20px;
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  font-family: var(--font-body);
+  transition: all 0.2s;
+}
+
+.github-star:hover {
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 /* === Responsive === */
