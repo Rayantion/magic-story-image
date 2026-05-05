@@ -242,19 +242,20 @@ const DrawCanvas = (() => {
   }
 
   function clear() {
-    saveState();
+    saveState(); // Save pre-clear drawing state
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    saveState(); // Save blank state so undo restores the drawing
     hasDrawing = false;
     notifyChange();
   }
 
   function loadImage(file) {
-    saveState();
     const reader = new FileReader();
     reader.onload = (e) => {
       const img = new Image();
       img.onload = () => {
+        saveState(); // Save current canvas before overwriting
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         const scale = Math.min(
@@ -264,6 +265,7 @@ const DrawCanvas = (() => {
         const x = (canvas.width - img.width * scale) / 2;
         const y = (canvas.height - img.height * scale) / 2;
         ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+        saveState(); // Save uploaded image state for undo/redo
         hasDrawing = true;
         notifyChange();
       };
