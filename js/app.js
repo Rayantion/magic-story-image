@@ -456,7 +456,9 @@ const App = (() => {
     if (!gen) return;
     compareIndex = 0;
     $("compare-drawing").src = gen.drawingDataUrl;
+    $("compare-drawing").alt = I18N.t("gallery.alt_drawing");
     $("compare-ai").src = gen.generatedImageUrl || "";
+    $("compare-ai").alt = I18N.t("gallery.alt_ai");
     $("compare-overlay").classList.remove("hidden");
     showCompareSide(0);
   }
