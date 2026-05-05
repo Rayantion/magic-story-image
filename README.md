@@ -6,7 +6,7 @@ A kid-friendly website where children can draw or upload images, describe them, 
 
 ## Live Site
 
-https://rayantion.github.io/magic-story-image/
+https://msi.jieren.my.id
 
 ## How It Works
 
