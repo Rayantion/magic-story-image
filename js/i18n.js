@@ -20,6 +20,8 @@ const I18N = (() => {
       "gallery.retry": "Retry",
       "gallery.drawn": "Your Drawing",
       "gallery.ai_image": "AI Magic",
+      "gallery.alt_drawing": "Drawing",
+      "gallery.alt_ai": "AI Image",
       "gallery.clear_history": "Clear History",
       "gallery.compare_hint": "Swipe or use arrow keys to compare",
       "gallery.download": "Download",
@@ -32,6 +34,7 @@ const I18N = (() => {
       "error.generic": "Something went wrong. Please try again.",
       "error.network": "Network error. Check your connection.",
       "error.webhook": "Image generation failed. Please try again.",
+      "error.timeout": "Image generation is taking too long. Please try again.",
     },
     "zh-TW": {
       "app.title": "魔法故事圖片",
@@ -53,6 +56,8 @@ const I18N = (() => {
       "gallery.retry": "重試",
       "gallery.drawn": "你的畫",
       "gallery.ai_image": "AI 魔法",
+      "gallery.alt_drawing": "繪圖",
+      "gallery.alt_ai": "AI 圖片",
       "gallery.clear_history": "清除歷史",
       "gallery.compare_hint": "滑動或使用方向鍵來比較",
       "gallery.download": "下載",
@@ -65,6 +70,7 @@ const I18N = (() => {
       "error.generic": "發生錯誤，請重試。",
       "error.network": "網路錯誤，請檢查連線。",
       "error.webhook": "圖片生成失敗，請重試。",
+      "error.timeout": "圖片生成時間過長，請重試。"
     },
   };
 
