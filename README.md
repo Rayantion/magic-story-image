@@ -42,6 +42,14 @@ https://msi.jieren.my.id
 }
 ```
 
+## Security Note
+
+The webhook URL is visible in the client-side JavaScript (`js/app.js`). This is **unavoidable** for a static client-side app — the browser must know the endpoint to send requests to. To mitigate abuse:
+
+- Add **CORS** and **referer validation** on the n8n webhook node.
+- Use **rate limiting** on the n8n instance.
+- Never commit API keys or secrets to this repo.
+
 ## n8n Workflow Setup
 
 The included `n8n-workflow.json` is ready to import into n8n. It uses two environment variables for the Ollama API connection:
