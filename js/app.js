@@ -51,6 +51,7 @@ const App = (() => {
     $("btn-compare-close").addEventListener("click", closeCompare);
     $("btn-show-drawing").addEventListener("click", () => showCompareSide(0));
     $("btn-show-ai").addEventListener("click", () => showCompareSide(1));
+    $("btn-compare-download").addEventListener("click", downloadCompareImage);
     $("compare-overlay").addEventListener("click", (e) => {
       if (e.target.id === "compare-overlay") closeCompare();
     });
@@ -467,6 +468,32 @@ const App = (() => {
     $("compare-ai-wrap").classList.toggle("active", index === 1);
     $("btn-show-drawing").classList.toggle("active", index === 0);
     $("btn-show-ai").classList.toggle("active", index === 1);
+  }
+
+  async function downloadCompareImage() {
+    const isDrawing = compareIndex === 0;
+    const src = isDrawing
+      ? $("compare-drawing").src
+      : $("compare-ai").src;
+    if (!src) {
+      showError(I18N.t("error.generic"));
+      return;
+    }
+
+    const filename = isDrawing
+      ? I18N.t("gallery.download_drawing") + ".png"
+      : I18N.t("gallery.download_generated") + ".png";
+
+    if (src.startsWith("data:")) {
+      const a = document.createElement("a");
+      a.href = src;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } else {
+      await downloadImage(src, filename);
+    }
   }
 
   document.addEventListener("DOMContentLoaded", init);
