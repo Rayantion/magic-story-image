@@ -78,9 +78,8 @@ const App = (() => {
   }
 
   function updateGenerateButton() {
-    const hasDesc = $("description-input").value.trim().length > 0;
     const hasDrawing = DrawCanvas.hasContent();
-    $("btn-generate").disabled = !(hasDesc && hasDrawing);
+    $("btn-generate").disabled = !hasDrawing;
   }
 
   function showError(msg) {
@@ -103,10 +102,6 @@ const App = (() => {
 
   function startGeneration() {
     const description = $("description-input").value.trim();
-    if (!description) {
-      showError(I18N.t("error.generic"));
-      return;
-    }
 
     const drawingDataUrl = DrawCanvas.toDataURL();
     const base64 = DrawCanvas.toBase64();
