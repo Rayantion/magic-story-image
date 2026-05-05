@@ -42,7 +42,46 @@ https://rayantion.github.io/magic-story-image/
 }
 ```
 
-See `n8n/response-template.json` for the n8n expression template.
+## n8n Workflow Setup
+
+The included `n8n-workflow.json` is ready to import into n8n. It uses two environment variables for the Ollama API connection:
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `OLLAMA_URL` | Ollama API endpoint | `https://ollama.com/api/generate` |
+| `OLLAMA_API_KEY` | Your Ollama API key | `sk-...` |
+
+### Option 1: n8n .env file
+
+Create or edit `.env` in your n8n installation directory:
+
+```env
+OLLAMA_URL=https://ollama.com/api/generate
+OLLAMA_API_KEY=your-ollama-api-key-here
+```
+
+Restart n8n after editing `.env`.
+
+### Option 2: n8n UI (Variables)
+
+In n8n, go to **Settings > Variables** and add:
+- `OLLAMA_URL`
+- `OLLAMA_API_KEY`
+
+### Import the workflow
+
+1. Open n8n
+2. Click **Workflows > Import from File**
+3. Select `n8n-workflow.json`
+4. Activate the workflow
+
+### Workflow flow
+
+1. **Webhook** — Receives `image` (base64), `description`, and `language`
+2. **Ollama Vision** — Describes the uploaded drawing using a vision model
+3. **Ollama Story** — Writes a short text-to-image prompt based on the description
+4. **Pollinations Image** — Generates the illustration via Pollinations.ai
+5. **Return Response** — Sends the image URL back to the frontend
 
 ## File Structure
 
@@ -54,6 +93,5 @@ See `n8n/response-template.json` for the n8n expression template.
 │   ├── app.js          # Main app logic
 │   ├── canvas.js       # Drawing canvas + upload
 │   └── i18n.js         # Translations
-└── n8n/
-    └── response-template.json  # n8n webhook response template
+└── n8n-workflow.json   # Full n8n workflow (import-ready)
 ```
