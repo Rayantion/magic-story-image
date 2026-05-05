@@ -27,6 +27,17 @@
 
     <!-- Header -->
     <header class="app-header">
+      <div class="header-actions">
+        <button id="btn-contact" class="header-btn contact-btn" data-i18n="contact.button">Contact</button>
+        <a
+          href="https://github.com/Rayantion/magic-story-image"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="header-btn star-btn"
+          >
+          ⭐ Star on GitHub
+        </a>
+      </div>
       <h1 class="app-title" data-i18n="app.title">Magic Story Image</h1>
       <p class="app-subtitle" data-i18n="app.subtitle">
         Draw a picture, get an AI illustration!
@@ -198,23 +209,6 @@
       </div>
     </div>
 
-    <!-- Contact Section -->
-    <section class="contact-section">
-      <button id="btn-contact" class="btn-secondary" data-i18n="contact.button">Contact</button>
-      <div id="contact-info" class="contact-info hidden">
-        <p data-i18n="contact.email_label">Email:</p>
-        <button id="btn-copy-email" class="email-btn">aaron@jieren.my.id</button>
-        <span id="copy-toast" class="copy-toast hidden" data-i18n="contact.copied">Copied!</span>
-      </div>
-      <a
-        href="https://github.com/Rayantion/magic-story-image"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="github-star"
-        >
-        ⭐ Star on GitHub
-      </a>
-    </section>
 
     <!-- Error Display -->
     <div id="error-banner" class="error-banner hidden">

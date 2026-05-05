@@ -77,6 +77,46 @@ body {
   padding: 0.5rem 1.5rem 1rem;
 }
 
+.header-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.header-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 1rem;
+  border: 2px solid var(--text-3);
+  border-radius: 20px;
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-body);
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.header-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.contact-btn.copied {
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+  background: rgba(68, 204, 68, 0.1);
+}
+
+.star-btn::before {
+  content: "⭐";
+  font-size: 0.9rem;
+}
+
 .app-title {
   font-family: var(--font-display);
   font-size: 2.2rem;
@@ -676,90 +716,6 @@ body {
   cursor: pointer;
   padding: 0;
   line-height: 1;
-}
-
-/* === Contact Section === */
-.contact-section {
-  max-width: 860px;
-  margin: 0 auto;
-  padding: 0 1.5rem 2rem;
-  text-align: center;
-}
-
-.contact-info {
-  margin-top: 1rem;
-  padding: 1rem;
-  background: var(--surface);
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-sm);
-}
-
-.contact-info p {
-  color: var(--text-2);
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
-}
-
-.email-btn {
-  display: inline-block;
-  padding: 0.6rem 1.2rem;
-  border: 2px solid var(--primary);
-  border-radius: var(--radius-sm);
-  background: var(--primary-dim);
-  color: var(--primary);
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: var(--font-body);
-  transition: all 0.2s;
-}
-
-.email-btn:hover {
-  background: var(--primary);
-  color: #fff;
-}
-
-.copy-toast {
-  display: inline-block;
-  margin-left: 0.75rem;
-  padding: 0.3rem 0.75rem;
-  background: var(--accent-green);
-  color: #fff;
-  border-radius: 12px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  animation: fade-in 0.3s ease;
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.github-star {
-  display: inline-block;
-  margin-top: 1rem;
-  padding: 0.5rem 1rem;
-  border: 2px solid var(--text-3);
-  border-radius: 20px;
-  background: var(--surface);
-  color: var(--text-2);
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-decoration: none;
-  font-family: var(--font-body);
-  transition: all 0.2s;
-}
-
-.github-star:hover {
-  border-color: var(--primary);
-  color: var(--primary);
 }
 
 /* === Responsive === */

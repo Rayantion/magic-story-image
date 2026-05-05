@@ -39,10 +39,7 @@ const App = (() => {
     );
 
     // Contact
-    $("btn-contact").addEventListener("click", () => {
-      $("contact-info").classList.toggle("hidden");
-    });
-    $("btn-copy-email").addEventListener("click", copyEmail);
+    $("btn-contact").addEventListener("click", morphContactButton);
 
     $("description-input").addEventListener("input", updateGenerateButton);
     DrawCanvas.onChange(updateGenerateButton);
@@ -404,12 +401,14 @@ const App = (() => {
 
   // === Contact ===
 
-  async function copyEmail() {
+  async function morphContactButton() {
+    const btn = $("btn-contact");
+    const originalText = I18N.t("contact.button");
     const email = "aaron@jieren.my.id";
+
     try {
       await navigator.clipboard.writeText(email);
     } catch {
-      // Fallback for older browsers
       const ta = document.createElement("textarea");
       ta.value = email;
       document.body.appendChild(ta);
@@ -417,9 +416,14 @@ const App = (() => {
       document.execCommand("copy");
       document.body.removeChild(ta);
     }
-    const toast = $("copy-toast");
-    toast.classList.remove("hidden");
-    setTimeout(() => toast.classList.add("hidden"), 2000);
+
+    btn.textContent = email + " ✓";
+    btn.classList.add("copied");
+
+    setTimeout(() => {
+      btn.textContent = originalText;
+      btn.classList.remove("copied");
+    }, 3000);
   }
 
   // === Direct Download ===
