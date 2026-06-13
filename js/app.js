@@ -1,7 +1,6 @@
 const App = (() => {
   const WEBHOOK_URL =
     "https://n8n.rayantion.me/webhook/e98c0572-0b47-40c9-b830-db97d4676521/";
-  const POLLINATIONS_TOKEN = "REDACTED_ROTATE_KEY";
   const DB_NAME = "magic-story-image";
   const DB_STORE = "generations";
   const DB_VERSION = 1;
@@ -143,19 +142,6 @@ const App = (() => {
     aiWrap.addEventListener("click", retry);
   }
 
-  async function fetchPollinationsImage(promptText) {
-    const url =
-      "https://gen.pollinations.ai/image/" +
-      encodeURIComponent(promptText) +
-      "?model=flux&nologo=true";
-    const resp = await fetch(url, {
-      headers: { Authorization: "Bearer " + POLLINATIONS_TOKEN },
-    });
-    if (!resp.ok) throw new Error("Pollinations " + resp.status);
-    const blob = await resp.blob();
-    return URL.createObjectURL(blob);
-  }
-
   function isSafeUrl(url) {
     if (!url || typeof url !== "string") return false;
     return (
@@ -223,21 +209,8 @@ const App = (() => {
           Array.isArray(data) && data.length > 0
             ? data[0].json || data[0]
             : data;
-        // n8n returns the Ollama story text; fetch image via auth header.
-        const promptText =
-          payload.prompt ||
-          payload.text ||
-          payload.output ||
-          payload.story ||
-          payload.imagePrompt ||
-          payload.myField ||
-          "";
-        if (promptText) {
-          imageUrl = await fetchPollinationsImage(promptText);
-        } else {
-          // Backward compat: workflow still returns a ready URL
-          imageUrl = payload.imageUrl || payload.url || "";
-        }
+        imageUrl =
+          payload.imageUrl || payload.myField || payload.url || "";
       } else if (
         contentType.includes("image/") ||
         contentType.includes("octet-stream")
