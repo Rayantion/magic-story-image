@@ -321,6 +321,12 @@ const App = (() => {
         aiWrap.appendChild(errorDiv);
       } else if (g.generatedImageUrl && isSafeUrl(g.generatedImageUrl)) {
         const aiImg = document.createElement("img");
+        // loading="lazy" throttles Pollinations fetches: the browser only
+        // requests an image when it scrolls into the viewport, so a 20-item
+        // gallery no longer fires 20 concurrent requests (Pollinations' free
+        // tier limits 1 concurrent request per IP → "Queue full" 402).
+        aiImg.loading = "lazy";
+        aiImg.decoding = "async";
         aiImg.src = g.generatedImageUrl;
         aiImg.alt = I18N.t("gallery.alt_ai");
         aiWrap.appendChild(aiImg);
