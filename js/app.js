@@ -90,6 +90,58 @@ const App = (() => {
     }, 5000);
   }
 
+  // Replace a failed AI <img> inside aiWrap with a visible "Pollinations is
+  // busy" placeholder. Tapping the placeholder retries the same URL with a
+  // cache-bust query, in case the 402 throttle has cleared.
+  function showThrottledPlaceholder(aiWrap, g) {
+    if (aiWrap.dataset.throttled === "1") return; // already shown
+    aiWrap.dataset.throttled = "1";
+    aiWrap.style.cursor = "pointer";
+    aiWrap.textContent = "";
+
+    const throttled = document.createElement("div");
+    throttled.style.cssText =
+      "display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:0.4rem;padding:1rem;text-align:center;background:var(--surface-alt);";
+
+    const title = document.createElement("div");
+    title.style.cssText =
+      "color:var(--accent-pink);font-size:0.95rem;font-weight:700;";
+    title.textContent = I18N.t("gallery.throttled");
+
+    const hint = document.createElement("div");
+    hint.style.cssText =
+      "color:var(--text-2);font-size:0.78rem;line-height:1.4;";
+    hint.textContent = I18N.t("gallery.throttled_hint");
+
+    throttled.appendChild(title);
+    throttled.appendChild(hint);
+    aiWrap.appendChild(throttled);
+
+    // Tap-to-retry: rebuild the <img> with a cache-bust query so the browser
+    // re-fires the request. If Pollinations is still 402, the onerror handler
+    // will run again and put the placeholder back.
+    const retry = () => {
+      aiWrap.removeEventListener("click", retry);
+      aiWrap.dataset.throttled = "0";
+      aiWrap.style.cursor = "";
+      aiWrap.textContent = "";
+      const aiImg = document.createElement("img");
+      aiImg.loading = "lazy";
+      aiImg.decoding = "async";
+      // Append a cache-bust so the browser doesn't serve a cached 402 page.
+      const sep = g.generatedImageUrl.includes("?") ? "&" : "?";
+      aiImg.src = g.generatedImageUrl + sep + "r=" + Date.now();
+      aiImg.alt = I18N.t("gallery.alt_ai");
+      aiImg.addEventListener(
+        "error",
+        () => showThrottledPlaceholder(aiWrap, g),
+        { once: true },
+      );
+      aiWrap.appendChild(aiImg);
+    };
+    aiWrap.addEventListener("click", retry);
+  }
+
   function isSafeUrl(url) {
     if (!url || typeof url !== "string") return false;
     return (
@@ -329,6 +381,15 @@ const App = (() => {
         aiImg.decoding = "async";
         aiImg.src = g.generatedImageUrl;
         aiImg.alt = I18N.t("gallery.alt_ai");
+        // Pollinations free tier returns 402 + JSON when the IP is throttled.
+        // Chromium can't render JSON as an image, so the <img> stays empty
+        // and the alt text shows. Surface this with a tap-to-retry placeholder
+        // so the user knows the failure is transient and recoverable.
+        aiImg.addEventListener(
+          "error",
+          () => showThrottledPlaceholder(aiWrap, g),
+          { once: true },
+        );
         aiWrap.appendChild(aiImg);
       }
 
