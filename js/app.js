@@ -208,8 +208,24 @@ const App = (() => {
           Array.isArray(data) && data.length > 0 && data[0].json
             ? data[0].json
             : data;
-        imageUrl =
-          payload.imageUrl || payload.myField || payload.url || "";
+        // n8n now returns the Ollama story text; build the Pollinations URL here.
+        const promptText =
+          payload.prompt ||
+          payload.text ||
+          payload.output ||
+          payload.story ||
+          payload.imagePrompt ||
+          payload.myField ||
+          "";
+        if (promptText) {
+          imageUrl =
+            "https://gen.pollinations.ai/image/" +
+            encodeURIComponent(promptText) +
+            "?model=flux&token=REDACTED_ROTATE_KEY";
+        } else {
+          // Backward compat: workflow still returns a ready URL
+          imageUrl = payload.imageUrl || payload.url || "";
+        }
       } else if (
         contentType.includes("image/") ||
         contentType.includes("octet-stream")
