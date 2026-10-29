@@ -1,6 +1,6 @@
 const App = (() => {
   const WEBHOOK_URL =
-    "https://n8n.rayantion.me/webhook/e98c0572-0b47-40c9-b830-db97d4676521/";
+    "https://n8n.jieren.my.id/webhook/e98c0572-0b47-40c9-b830-db97d4676521/";
   const DB_NAME = "magic-story-image";
   const DB_STORE = "generations";
   const DB_VERSION = 1;

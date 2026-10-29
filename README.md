@@ -22,7 +22,7 @@ Browser (msi.jieren.my.id)
   │
   │ POST /webhook (image base64 + description + language)
   ▼
-n8n Workflow (n8n.rayantion.me)
+n8n Workflow (n8n.jieren.my.id)
   │
   ├─ Ollama Vision  → describes the drawing
   ├─ Ollama Story   → writes text-to-image prompt
@@ -45,7 +45,7 @@ API keys (Pollinations pollen token) live **only** in n8n as encrypted credentia
 
 ## Webhook Integration
 
-**Endpoint:** `POST https://n8n.rayantion.me/webhook/e98c0572-0b47-40c9-b830-db97d4676521/`
+**Endpoint:** `POST https://n8n.jieren.my.id/webhook/e98c0572-0b47-40c9-b830-db97d4676521/`
 
 **Request body:**
 ```json
